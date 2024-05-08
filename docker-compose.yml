@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  nestapp:
+    build: ./
+    ports:
+      - "3000:3000"
+    networks:
+      - netemacuello
+    env_file: .env.development
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres
+    env_file:
+      - .env.development
+    networks:
+      - netemacuello
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+networks:
+  netemacuello:
+
+volumes:
+  pgdata:
