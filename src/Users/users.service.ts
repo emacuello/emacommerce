@@ -79,7 +79,7 @@ export class UsersService {
         if (!usersExist)
             throw new NotFoundException(`Usuario con el id ${id} no existe`);
         console.log(usersExist);
-        if (usersExist.orders)
+        if (usersExist.orders.length > 0)
             throw new BadRequestException(
                 'No se puede borrar un usuario con ordenes de compra',
             );
