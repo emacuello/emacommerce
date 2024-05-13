@@ -10,6 +10,7 @@ import { ProductsDtos, PutProductDto } from '../dtos/product.dtos';
 import { Category } from '../entities/categories.entity';
 import { products } from '../helpers/data.seed';
 import { Order } from '../entities/order.entity';
+import { OrderDetails } from 'src/entities/orderDetails.entity';
 
 @Injectable()
 export class ProductsService {
@@ -20,6 +21,8 @@ export class ProductsService {
         private categoryRepository: Repository<Category>,
         @InjectRepository(Order)
         private orderRepository: Repository<Order>,
+        @InjectRepository(OrderDetails)
+        private orderDetailsRepository: Repository<OrderDetails>,
     ) {}
     async findProducts(page: number, limit: number) {
         const products = (
@@ -52,7 +55,6 @@ export class ProductsService {
     }
 
     async createProduct() {
-        // * Solamente funciona si ya fue CARGADO category en la base de datos!!!!!!
         return Promise.allSettled(
             products.map(async (product) => {
                 const { category, ...rest } = product;
@@ -70,14 +72,24 @@ export class ProductsService {
                             category: findCategory,
                         });
                     } else {
-                        // ! Esta parte de la funcion no funciona correctamente, por eso es mejor tener las categorias en la base de datos previamente
-                        const newCategory = await this.categoryRepository.save({
-                            name: category,
-                        });
-                        await this.productRepository.save({
-                            ...rest,
-                            category: newCategory,
-                        });
+                        await this.categoryRepository
+                            .createQueryBuilder()
+                            .insert()
+                            .into(Category)
+                            .values({ name: category })
+                            .orIgnore()
+                            .execute();
+                        const newCategory = await this.categoryRepository
+                            .createQueryBuilder()
+                            .setFindOptions({ where: { name: category } })
+                            .getOne();
+                        await this.productRepository
+                            .createQueryBuilder()
+                            .insert()
+                            .into(Product)
+                            .values({ ...rest, category: newCategory })
+                            .orIgnore()
+                            .execute();
                     }
                 }
             }),
@@ -87,6 +99,49 @@ export class ProductsService {
                     'Error al crear los productos, verificar en la base datos cuales fueron creadas y cuales no con sus respectivas categorias!! es recomendable tener las categorias en la base de datos previamente antes de ejecutar esta funcion!!!',
                 );
             return 'Productos creados correctamente';
+        });
+    }
+    async restartProducts() {
+        const productsErrors = {};
+        return Promise.allSettled(
+            products.map(async (product) => {
+                const products = await this.productRepository.findOneBy({
+                    name: product.name,
+                });
+                if (products) {
+                    const findOrder = await this.orderDetailsRepository.find({
+                        relations: ['products'],
+                    });
+                    if (!findOrder) {
+                        await this.productRepository.update(
+                            { id: products.id },
+                            { stock: products.stock },
+                        );
+                    }
+                    findOrder.forEach(async (order) => {
+                        if (!order.products.some((p) => p.id === products.id)) {
+                            await this.productRepository.update(
+                                { id: products.id },
+                                { stock: products.stock },
+                            );
+                        } else
+                            productsErrors[products.name] =
+                                `El producto ${products.name} con el id ${products.id} no fue actualizado porque se encuentra en el pedido con el id ${order.id}`;
+                    });
+                }
+            }),
+        ).then((values) => {
+            if (values.some((value) => value.status === 'rejected'))
+                throw new BadRequestException(
+                    'Algunos pedidos no fueron resetados correctamente',
+                );
+            if (Object.keys(productsErrors).length > 0)
+                throw new BadRequestException({
+                    message:
+                        'Error al actualizar los productos, Los productos con ordenes activas no se pueden actualizar',
+                    productsAffected: productsErrors,
+                });
+            return 'Productos reseteados correctamente';
         });
     }
     async postProduct(product: ProductsDtos) {

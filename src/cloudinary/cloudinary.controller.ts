@@ -18,7 +18,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from '../entities/products.entity';
 import { Repository } from 'typeorm';
 import { AuthGuard } from '../guards/auth.guard';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Files')
 @Controller('files')
@@ -30,6 +30,19 @@ export class CloudinaryController {
     ) {}
 
     @ApiBearerAuth()
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        required: true,
+        schema: {
+            type: 'object',
+            properties: {
+                file: {
+                    type: 'string',
+                    format: 'binary',
+                },
+            },
+        },
+    })
     @Post('uploadImages/:id')
     @UseGuards(AuthGuard)
     @UseInterceptors(FileInterceptor('file'))

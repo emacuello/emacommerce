@@ -38,8 +38,8 @@ export class ProductsController {
     }
 
     @Get('seeders')
-    async createProduct() {
-        return await this.pruductsService.createProduct();
+    async restartProducts() {
+        return await this.pruductsService.restartProducts();
     }
 
     @ApiBearerAuth()
