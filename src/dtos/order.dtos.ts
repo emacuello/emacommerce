@@ -25,7 +25,6 @@ export class OrderDtos {
         ],
         description: 'Listado de productos',
     })
-    @ValidateNested({ each: true })
     @IsArray()
     @ArrayMinSize(1)
     @Type(() => Product)

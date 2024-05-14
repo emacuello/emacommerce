@@ -23,6 +23,7 @@ export class OrdersService {
     ) {}
 
     async addOrder(productCart: OrderDtos) {
+        const productsWhitOutStock = {};
         const date = new Date().toLocaleString();
         const order = this.orderRepository.create({ date: date });
         const user = await this.userRepository.findOneBy({
@@ -30,38 +31,74 @@ export class OrdersService {
         });
         let total = 0;
         if (!user) throw new NotFoundException('Usuario no encontrado');
-        if (productCart.products.length === 0)
+        if (Object.keys(productCart.products).length === 0)
             throw new BadRequestException('No hay productos en el carrito');
         const products = await Promise.all(
             productCart.products.map(async (product) => {
                 const product_ = await this.productRepository.findOneBy({
                     id: product.id,
                 });
-                console.log(product_, 'log 1');
-
-                if (product_.stock !== 0) {
+                if (product_.stock > 0) {
                     total += Number(product_.price);
-                    await this.productRepository.update(product_.id, {
-                        stock: product_.stock - 1,
-                    });
+                    await this.productRepository
+                        .createQueryBuilder()
+                        .update()
+                        .set({ stock: product_.stock - 1 })
+                        .where('id = :id', { id: product_.id })
+                        .execute();
+
+                    return product_;
+                } else {
+                    productsWhitOutStock[product_.name] =
+                        `El producto ${product_.name} con el id ${product_.id} no tiene stock`;
+                    return null;
                 }
-                return product_;
             }),
         );
         const orderDetails = this.orderDetailstRepository.create({
             price: Number(total.toFixed(2)),
         });
+        if (products.includes(null) && products.length === 1)
+            throw new BadRequestException(
+                'El producto no tiene stock disponible',
+            );
         order.user = user;
         order.orderDetails = orderDetails;
         orderDetails.products = products;
         await this.orderDetailstRepository.save(orderDetails);
         const newOrder = await this.orderRepository.save(order);
+        const {} = newOrder;
         if (!newOrder)
             throw new BadRequestException(
                 'Algo salio mal, la orden no fue creada',
             );
+        const {
+            user: user_,
+            date: date_,
+            id,
+            orderDetails: orderDetails_,
+        } = newOrder;
+        const { password, role, ...rest } = user_;
+        const newOrder_ = {
+            user: rest,
+            date: date_,
+            id,
+            orderDetails: orderDetails_,
+        };
 
-        return newOrder;
+        if (Object.keys(productsWhitOutStock).length === 0) {
+            return {
+                message: 'Orden creada con exito',
+                productStatus: 'Todos los porductos tienen stock disponible',
+                newOrder_,
+            };
+        } else {
+            return {
+                message: 'Orden creada con exito',
+                productsStatus: productsWhitOutStock,
+                newOrder_,
+            };
+        }
     }
 
     async getOrders(id: string) {
