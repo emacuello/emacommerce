@@ -4,7 +4,7 @@
 
 Emacommerce es un E-Commerce API desarollado con NestJS, TypeScript, y PostgreSQL.
 
-Está deployado en Vercel y se puede acceder a la documentación a través de la siguiente URL: https://emacommerce.com.br
+Está deployado en Vercel y se puede acceder a la documentación a través de la siguiente URL: https://emacommerce.vercel.app/api
 
 Su base de datos está alojada en Neon.
 
