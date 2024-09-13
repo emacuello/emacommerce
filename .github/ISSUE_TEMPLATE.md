@@ -1,14 +1,14 @@
 ---
-title: "⚠️ {{ env.ACTION_TYPE }} Failed in {{ payload.repository.name }}"
-assignees: "{{ payload.sender.login }}"
-labels: "bug, automation"
+title: '⚠️ {{ env.ACTION_TYPE }} Failed in {{ payload.repository.name }}'
+assignees: 'testing'
+labels: 'bug, automation'
 ---
 
 La acción **{{ env.ACTION_TYPE }}** falló en la ejecución del flujo de trabajo en la rama **{{ github.ref }}**. Por favor, revisa los errores y toma las medidas necesarias.
 
 ### Detalles del error:
 
-- [Enlace al flujo de trabajo fallido]({{ github.server_url }}/{{ github.repository }}/actions/runs/{{ github.run_id }})
+-   [Enlace al flujo de trabajo fallido]({{ github.server_url }}/{{ github.repository }}/actions/runs/{{ github.run_id }})
 
 ### Pasos a seguir:
 
