@@ -7,7 +7,7 @@ La acción **{{ env.ACTION_TYPE }}** falló en la ejecución del flujo de trabaj
 
 ### Detalles del error:
 
--   [Enlace al flujo de trabajo fallido]({{ github.server_url }}/{{ github.repository }}/actions/runs/{{ github.run_id }})
+-   [Enlace al flujo de trabajo fallido]({{ env.URL_ACTION_RUN }})
 
 ### Pasos a seguir:
 
