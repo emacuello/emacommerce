@@ -27,3 +27,33 @@ jobs:
                   tags: |
                       ${{ secrets.DOCKERHUB_USERNAME }}/emacommerce:${{ github.sha }}
                       ${{ secrets.DOCKERHUB_USERNAME }}/emacommerce:latest
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 18
+            - name: Install dependencies
+              run: npm install
+            - name: Build
+              run: npm run build
+            - name: Deploy to Vercel
+              uses: amondnet/vercel-action@v25
+              with:
+                  vercel-token: ${{ secrets.VERCEL_TOKEN }}
+                  github-token: ${{ secrets.GH_TOKEN }}
+                  vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+                  vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+                  scope: ${{ secrets.VERCEL_ORG_ID }}
+                  working-directory: ./
+                  github-comment: true
+                  vercel-args: '--prod'
+            - name: Create issue if build fails
+              if: failure()
+              uses: JasonEtco/create-an-issue@v2
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+                  ACTION_TYPE: 'Deploy'
