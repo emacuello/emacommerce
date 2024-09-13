@@ -1,6 +1,5 @@
 ---
 title: '⚠️ {{ env.ACTION_TYPE }} Failed in {{ payload.repository.name }}'
-assignees: 'testing'
 labels: 'bug, automation'
 ---
 
