@@ -3,7 +3,7 @@ title: '⚠️ {{ env.ACTION_TYPE }} Failed in {{ payload.repository.name }}'
 labels: 'bug, automation'
 ---
 
-La acción **{{ env.ACTION_TYPE }}** falló en la ejecución del flujo de trabajo en la rama **{{ github.ref }}**. Por favor, revisa los errores y toma las medidas necesarias.
+La acción **{{ env.ACTION_TYPE }}** falló en la ejecución del flujo de trabajo en la rama **{{ env.BRANCH }}**. Por favor, revisa los errores y toma las medidas necesarias.
 
 ### Detalles del error:
 

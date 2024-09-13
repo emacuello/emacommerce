@@ -61,5 +61,6 @@ jobs:
                   GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
                   ACTION_TYPE: 'Deploy'
                   URL_ACTION_RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+                  BRANCH: ${{ github.ref }}
               with:
                   assignees: ${{ github.event.sender.login }}
