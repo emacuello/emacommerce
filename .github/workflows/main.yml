@@ -24,4 +24,6 @@ jobs:
                   context: .
                   file: ./Dockerfile
                   push: true
-                  tags: ${{ secrets.DOCKERHUB_USERNAME }}/emacommerce:latest
+                  tags: |
+                      ${{ secrets.DOCKERHUB_USERNAME }}/emacommerce:${{ github.sha }}
+                      ${{ secrets.DOCKERHUB_USERNAME }}/emacommerce:latest
