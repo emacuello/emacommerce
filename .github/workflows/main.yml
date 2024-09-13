@@ -50,7 +50,7 @@ jobs:
                   scope: ${{ secrets.VERCEL_ORG_ID }}
                   working-directory: ./
                   github-comment: true
-                  vercel-args: '--prod'
+                  vercel-args: '--pre'
             - name: Create issue if build fails
               if: failure()
               uses: JasonEtco/create-an-issue@v2
