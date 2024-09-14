@@ -1,0 +1,42 @@
+name: Lint
+
+on:
+    push:
+        branches:
+            - 'main'
+    pull_request:
+        branches:
+            - 'main'
+
+jobs:
+    lint:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            packages: read
+            # To report GitHub Actions status checks
+            statuses: write
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 18
+            - name: Install dependencies
+              run: npm ci --legacy-peer-deps --no-audit --no-fund
+            - name: Super-linter
+              uses: super-linter/super-linter@v7.1.0
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Create issue if build fails
+              if: failure()
+              uses: JasonEtco/create-an-issue@v2
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+                  ACTION_TYPE: 'Deploy'
+                  URL_ACTION_RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+                  BRANCH: ${{ github.ref }}
+              with:
+                  assignees: ${{ github.event.sender.login }}

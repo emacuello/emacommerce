@@ -37,7 +37,7 @@ jobs:
               with:
                   node-version: 18
             - name: Install dependencies
-              run: npm install
+              run: npm install --legacy-peer-deps --no-audit --no-fund
             - name: Build
               run: npm run build
             - name: Imprimir el valor de sender.login
@@ -53,8 +53,8 @@ jobs:
                   scope: ${{ secrets.VERCEL_ORG_ID }}
                   working-directory: ./
                   github-comment: true
-                  vercel-args: '--pre'
-            - name: Create issue if build fails
+                  #vercel-args: '--prod'
+            - name: Create issue if deployment fails
               if: failure()
               uses: JasonEtco/create-an-issue@v2
               env:
