@@ -20,7 +20,7 @@ jobs:
             - name: Install dependencies
               run: npm ci --legacy-peer-deps --no-audit --no-fund
             - name: Eslint
-              run: echo "Eslint"
+              run: npm run lint
             - name: Create issue if deployment fails
               if: failure()
               uses: JasonEtco/create-an-issue@v2
@@ -31,3 +31,14 @@ jobs:
                   BRANCH: ${{ github.ref }}
               with:
                   assignees: ${{ github.event.sender.login }}
+            - name: Comment on PR if failed
+              if: failure()
+              uses: exercism/pr-commenter-action@v1.5.1
+              with:
+                  github-token: '${{ secrets.GH_TOKEN }}'
+                  config-file: '.github/failed-pr.yml'
+            - name: Comment on PR
+              uses: exercism/pr-commenter-action@v1.5.1
+              with:
+                  github-token: '${{ secrets.GH_TOKEN }}'
+                  config-file: '.github/pr-commenter.yml'
