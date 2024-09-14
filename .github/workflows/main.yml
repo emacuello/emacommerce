@@ -40,10 +40,8 @@ jobs:
               run: npm install --legacy-peer-deps --no-audit --no-fund
             - name: Build
               run: npm run build
-            - name: Imprimir el valor de sender.login
-              run: |
-                  echo "El usuario que hizo el push es: ${{ github.event.sender.login }}"
             - name: Deploy to Vercel
+              id: deploy
               uses: amondnet/vercel-action@v25
               with:
                   vercel-token: ${{ secrets.VERCEL_TOKEN }}
@@ -53,7 +51,9 @@ jobs:
                   scope: ${{ secrets.VERCEL_ORG_ID }}
                   working-directory: ./
                   github-comment: true
-                  #vercel-args: '--prod'
+                  vercel-args: '--prod'
+            - name: Print URL
+              run: echo ${{ steps.deploy.outputs.preview-url }}
             - name: Create issue if deployment fails
               if: failure()
               uses: JasonEtco/create-an-issue@v2

@@ -1,3 +1,5 @@
+[![deploy](https://github.com/emacuello/emacommerce/actions/workflows/main.yml/badge.svg)](https://github.com/emacuello/emacommerce/actions/workflows/main.yml)
+
 # Emacommerce - E-Commerce API
 
 ## Description
