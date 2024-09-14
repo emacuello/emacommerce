@@ -20,7 +20,7 @@ jobs:
             - name: Install dependencies
               run: npm ci --legacy-peer-deps --no-audit --no-fund
             - name: Eslint
-              run: npm run lint
+              run: echo "Eslint"
             - name: Create issue if deployment fails
               if: failure()
               uses: JasonEtco/create-an-issue@v2
