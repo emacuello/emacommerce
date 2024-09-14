@@ -1,9 +1,12 @@
 name: deploy
 
 on:
-    push:
-        branches:
-            - 'main'
+    pull_request:
+        types: [opened, synchronize, reopened, ready_for_review]
+        branches: [main]
+        # push:
+        #     branches:
+        #         - 'main'
 
 jobs:
     build:
@@ -51,7 +54,7 @@ jobs:
                   scope: ${{ secrets.VERCEL_ORG_ID }}
                   working-directory: ./
                   github-comment: true
-                  vercel-args: '--prod'
+                  # vercel-args: '--prod'
             - name: Print URL
               run: echo ${{ steps.deploy.outputs.preview-url }}
             - name: Create issue if deployment fails
