@@ -33,12 +33,20 @@ jobs:
                   assignees: ${{ github.event.sender.login }}
             - name: Comment on PR if failed
               if: failure()
-              uses: exercism/pr-commenter-action@v1.5.1
+              uses: unsplash/comment-on-pr@v1.3.0
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
               with:
-                  github-token: '${{ secrets.GH_TOKEN }}'
-                  config-file: '.github/failed-pr.yml'
+                  msg: 'Bro :disappointed:'
+                  check_for_duplicate_msg: false # OPTIONAL
+                  delete_prev_regex_msg: '[0-9]' # OPTIONAL
+                  duplicate_msg_pattern: '[A-Z]' # OPTIONAL
             - name: Comment on PR
-              uses: exercism/pr-commenter-action@v1.5.1
+              uses: unsplash/comment-on-pr@v1.3.0
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
               with:
-                  github-token: '${{ secrets.GH_TOKEN }}'
-                  config-file: '.github/pr-commenter.yml'
+                  msg: 'Nice PR Bro :+1:'
+                  check_for_duplicate_msg: false # OPTIONAL
+                  delete_prev_regex_msg: '[0-9]' # OPTIONAL
+                  duplicate_msg_pattern: '[A-Z]' # OPTIONAL
