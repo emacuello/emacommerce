@@ -19,6 +19,10 @@ jobs:
                   cache-dependency-path: '**/package-lock.json'
             - name: Install dependencies
               run: npm ci --legacy-peer-deps --no-audit --no-fund
+            - name: Test command
+              run: |
+                  echo ${{ github.repository }}
+                  echo ${{ github.repository.name }}
             - name: Eslint
               run: npm run lint
             - name: Create issue if deployment fails
