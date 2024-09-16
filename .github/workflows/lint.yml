@@ -19,10 +19,16 @@ jobs:
                   cache-dependency-path: '**/package-lock.json'
             - name: Install dependencies
               run: npm ci --legacy-peer-deps --no-audit --no-fund
+            - name: Get repository name
+              id: repo-name
+              uses: MariachiBear/get-repo-name-action@v1.1.0
+              with:
+                  with-owner: 'true'
+                  string-case: 'uppercase'
             - name: Test command
               run: |
                   echo ${{ github.repository }}
-                  echo ${{ github.repository.name }}
+                  echo ${{ steps.repo-name.outputs.repository-name }}
             - name: Eslint
               run: npm run lint
             - name: Create issue if deployment fails
