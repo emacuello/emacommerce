@@ -23,13 +23,14 @@ jobs:
               id: repo-name
               uses: MariachiBear/get-repo-name-action@v1.1.0
             - name: Test command
+              if: failure() && github.event_name == 'push'
               run: |
                   echo ${{ github.repository }}
                   echo ${{ steps.repo-name.outputs.repository-name }}
             - name: Eslint
               run: npm run lint
             - name: Create issue if deployment fails
-              if: failure()
+              if: failure() && github.event_name == 'push'
               uses: JasonEtco/create-an-issue@v2
               env:
                   GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
